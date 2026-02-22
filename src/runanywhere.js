@@ -2,7 +2,7 @@
  * RunAnywhere SDK initialization and model catalog.
  *
  * This module:
- * 1. Initializes the core SDK (TypeScript-only, no WASM)
+ * 1. Initializes the core SDK (JavaScript-only, no WASM)
  * 2. Registers the LlamaCPP backend (loads LLM/VLM WASM)
  * 3. Registers the ONNX backend (sherpa-onnx — STT/TTS/VAD)
  * 4. Registers the model catalog and wires up VLM worker
@@ -16,21 +16,18 @@ import {
   ModelManager,
   ModelCategory,
   LLMFramework,
-  type CompactModelDef,
-} from '@runanywhere/web';
-
-import { LlamaCPP, VLMWorkerBridge } from '@runanywhere/web-llamacpp';
-import { ONNX } from '@runanywhere/web-onnx';
+} from '@runanywhere/web'
+import { LlamaCPP, VLMWorkerBridge } from '@runanywhere/web-llamacpp'
+import { ONNX } from '@runanywhere/web-onnx'
 
 // Vite bundles the worker as a standalone JS chunk and returns its URL.
-// @ts-ignore — Vite-specific ?worker&url query
 import vlmWorkerUrl from './workers/vlm-worker?worker&url';
 
 // ---------------------------------------------------------------------------
 // Model catalog
 // ---------------------------------------------------------------------------
 
-const MODELS: CompactModelDef[] = [
+const MODELS = [
   // LLM — Liquid AI LFM2 350M (small + fast for chat)
   {
     id: 'lfm2-350m-q4_k_m',
@@ -59,7 +56,7 @@ const MODELS: CompactModelDef[] = [
     framework: LLMFramework.ONNX,
     modality: ModelCategory.SpeechRecognition,
     memoryRequirement: 105_000_000,
-    artifactType: 'archive' as const,
+    artifactType: 'archive',
   },
   // TTS (sherpa-onnx archive)
   {
@@ -69,7 +66,7 @@ const MODELS: CompactModelDef[] = [
     framework: LLMFramework.ONNX,
     modality: ModelCategory.SpeechSynthesis,
     memoryRequirement: 65_000_000,
-    artifactType: 'archive' as const,
+    artifactType: 'archive',
   },
   // VAD (single ONNX file)
   {
@@ -87,14 +84,14 @@ const MODELS: CompactModelDef[] = [
 // Initialization
 // ---------------------------------------------------------------------------
 
-let _initPromise: Promise<void> | null = null;
+let _initPromise = null;
 
 /** Initialize the RunAnywhere SDK. Safe to call multiple times. */
-export async function initSDK(): Promise<void> {
+export async function initSDK() {
   if (_initPromise) return _initPromise;
 
   _initPromise = (async () => {
-    // Step 1: Initialize core SDK (TypeScript-only, no WASM)
+    // Step 1: Initialize core SDK (JavaScript-only, no WASM)
     await RunAnywhere.initialize({
       environment: SDKEnvironment.Development,
       debug: true,
@@ -121,7 +118,7 @@ export async function initSDK(): Promise<void> {
 }
 
 /** Get acceleration mode after init. */
-export function getAccelerationMode(): string | null {
+export function getAccelerationMode() {
   return LlamaCPP.isRegistered ? LlamaCPP.accelerationMode : null;
 }
 
